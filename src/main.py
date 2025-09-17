@@ -8,7 +8,12 @@ app = FastAPI()
 def index():
     return "Hello World!"
 
-@app.get('/blog/all')
+@app.get(
+    '/blog/all',
+    tags=['blog'],
+    summary="Retrieve all blogs",
+    description="This api call simulates fetching all blogs"
+    )
 def get_all_blogs(page: int = 1 , page_size: Optional[int] = None):
     return {"message" : f"All {page_size} blogs on {page}"}
 
@@ -24,3 +29,19 @@ class BlogType(str, Enum):
 @app.get('/blog/type/{type}')
 def get_blog_type(type: BlogType):
     return {"message" : f"Blog type: {type}"}
+
+@app.get(
+    '/blog/{id}/comments/{comment_id}',
+    tags = ["comment", "blog"],
+    summary="모든 내용 긁어옴"
+    )
+def get_blog_comment(id, comment_id, valid, username):
+    """
+    Simulates Retrieving a Comment of a blog
+
+    - **id** mandatory path parameter
+    - **comment** mandatory path parameter
+    - **valid** optional query parameter
+    - **username** optional query parameter
+    """
+    return {"message" : "ㅇㅁㅇ"}
