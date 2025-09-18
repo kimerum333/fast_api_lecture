@@ -1,6 +1,7 @@
-from fastapi import APIRouter
 from enum import Enum
 from typing import Optional
+
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/blog", tags=["blog"])
 
@@ -10,7 +11,10 @@ router = APIRouter(prefix="/blog", tags=["blog"])
     summary="Retrieve all blogs",
     description="This api call simulates fetching all blogs",
 )
-def get_all_blogs(page: int = 1, page_size: Optional[int] = None):
+def get_all_blogs(
+    page: int = 1,
+    page_size: Optional[int] = None,
+):
     return {"message": f"All {page_size} blogs on {page}"}
 
 
@@ -30,8 +34,17 @@ def get_blog_type(type: BlogType):
     return {"message": f"Blog type: {type}"}
 
 
-@router.get("/{id}/comments/{comment_id}", tags=["comment"], summary="모든 내용 긁어옴")
-def get_blog_comment(id, comment_id, valid, username):
+@router.get(
+    "/{id}/comments/{comment_id}",
+    tags=["comment"],
+    summary="모든 내용 긁어옴",
+)
+def get_blog_comment(
+    id,
+    comment_id,
+    valid,
+    username,
+):
     """
     Simulates Retrieving a Comment of a blog
 
