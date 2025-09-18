@@ -36,7 +36,6 @@ def create_comment(
     ),
     v: Optional[List[str]] = Query(["1.1", "1.3"]),
     comment_id: int = Path(
-        None,
         gt=5,
         le=10,
     ),
