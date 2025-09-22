@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from sqlalchemy.orm.session import Session
 
 from src.db.hash import Hash
@@ -15,3 +16,37 @@ def create_user(db: Session, request: UserBase):
     db.commit()  # 자동 생성 ID 가 이 시점에 DB에서 생겨난다.
     db.refresh(new_user)  # 자동생성된 ID를 받아오기 위한 리프래시
     return new_user
+
+
+def get_all_users(db: Session):
+    return db.query(DbUser).all()
+
+
+def get_user(db: Session, id: int):
+    user = db.query(DbUser).filter(DbUser.id == id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"user with id {id} not found",
+        )
+    return user
+
+
+def update_user(db: Session, id: int, request: UserBase):
+    user = db.query(DbUser).filter(DbUser.id == id)
+    user.update(
+        {
+            DbUser.username: request.username,
+            DbUser.email: request.email,
+            DbUser.password: Hash.bcrypt(request.password),
+        }
+    )
+    db.commit()
+    return "ok"
+
+
+def delete_user(db: Session, id: int):
+    user = db.query(DbUser).filter(DbUser.id == id).first()
+    db.delete(user)
+    db.commit()
+    return "ok"
