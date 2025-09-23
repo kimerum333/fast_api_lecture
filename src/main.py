@@ -4,13 +4,14 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from src.db import models
 from src.db.database import engine
 from src.exceptions import StoryException
-from src.routers import article, blog_get, blog_post, user
+from src.routers import article, blog_get, blog_post, product, user
 
 app = FastAPI()
 app.include_router(blog_get.router)
 app.include_router(blog_post.router)
 app.include_router(user.router)
 app.include_router(article.router)
+app.include_router(product.router)
 
 
 @app.get("/")

@@ -1,37 +1,36 @@
-# Response 객체 커스터마이징하기
-## 기본 Response
-- fast api 에서 별달리 response 를 커스터마이징하지 않으면, json 형태로 리턴한다.
-- 그러나 가끔은 json 말고 다른 형태의 리스폰스를 주고 싶을 때도 있다.
-- 그럴 때를 위해 리스폰스를 커스터마이징 하는 상황을 다루는 챕터다.
+from typing import List, Optional
 
-## 코드 샘플
-```python
+from fastapi import APIRouter, Cookie, Form, Header, Response
+from fastapi.responses import HTMLResponse, PlainTextResponse
+
+router = APIRouter(
+    prefix="/product",
+    tags=["product"],
+)
+
 products = ["watch", "camera", "phone"]
+
+
+@router.post("/new")
+def create_product(name: str = Form(...)):
+    products.append(name)
+    return products
+
 
 @router.get("/")
 def get_all_products():
-    # return products 를 하면, json 형태로 어레이를 보내는게 기본값.
-    # 플레인텍스트로 보내주기 위한 리스폰스의 커스터마이징
     data = " ".join(products)
-    return Response(
+    response = Response(
         content=data,
         media_type="text/plain",
     )
+    response.set_cookie(key="test_cookie", value="test_cookie_value")
+    return response
 
-```
-## 하는 이유?
-1. 추가적인 파라미터를 줄 수 있다. (헤더, 쿠키)
-2. Json 외의 다른 타입 xml, html, file, stream 등도 다룰 수 있다.
-3. 같은 엔드포인트에서 파라미터에 따라 2,1을 선택 가능
-```
-```
-## API 예시까지 커스텀
-```python
-from fastapi.responses import HTMLResponse, PlainTextResponse
 
 @router.get(
     "/{id}",
-    responses={ # 이렇게 각 hhtp 코드별로 어떤 응답이 어떤 형태로 가는지 예시와 함께 작성 가능
+    responses={
         200: {
             "content": {
                 "text/html": {"example": "<div>Product</div>"},
@@ -68,4 +67,17 @@ def get_product(id: int):
         """
         return HTMLResponse(content=out, media_type="text/html")
 
-```
+
+@router.get("withheader")
+def get_products(
+    response: Response,
+    custom_header: Optional[List[str]] = Header(None),
+    test_cookie: Optional[str] = Cookie(None),
+):
+    if custom_header:
+        response.headers["custom_response_header"] = " and ".join(custom_header)
+    return {
+        "data": products,
+        "custom_header": custom_header,
+        "test_cookie": test_cookie,
+    }
