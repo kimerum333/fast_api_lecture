@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 
 from src.auth import authentication
 from src.db import models
@@ -34,5 +35,11 @@ def story_exception_handler(request: Request, exc: StoryException):
 def custom_exception_handler(request: Request, exc: HTTPException):
     return PlainTextResponse(str(exc), status_code=400)
 
+
+app.mount(
+    "/files",  # endpoint
+    StaticFiles(directory="files"),  # mountpoint
+    name="files",
+)
 
 models.Base.metadata.create_all(engine)
