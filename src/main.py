@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request, status, Response
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -7,6 +7,7 @@ from src.db import models
 from src.db.database import engine
 from src.exceptions import StoryException
 from src.routers import article, blog_get, blog_post, file, product, user
+import time
 
 app = FastAPI()
 app.include_router(authentication.router)
@@ -17,6 +18,13 @@ app.include_router(user.router)
 app.include_router(article.router)
 app.include_router(product.router)
 
+@app.middleware("http")
+async def add_middleware(request: Request, call_next):
+    start_time = time.time()
+    response:Response = await call_next(request)
+    duration = time.time() - start_time
+    response.headers["duration"] = str(duration)
+    return response
 
 @app.get("/")
 def index():
